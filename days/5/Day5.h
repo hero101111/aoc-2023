@@ -64,7 +64,7 @@ public:
       {
         cout << "Reading data" << endl;
         auto seedData = RegExMatchN(d, R"(\d+)");
-        list<LLX> vec;
+        list<LLX> & vec = world[DataType::Seed];
         for (int i = 0; i < seedData.size() - 1; i += 2)
         {
           cout << i << " ";
@@ -73,7 +73,7 @@ public:
           for (LL j = p; j < p + len; ++j)
             vec.push_back(j);
         }
-        world[crtType] = vec;
+        //world[crtType] = vec;
         firstLine = false;
         cout << "Done reading data" << endl;
         continue;
@@ -129,7 +129,7 @@ public:
      // cout << d << endl;
     }
 
-    auto lastData = world[DataType::Seed];
+    auto & lastData = world[DataType::Seed];
     ret = *min_element(begin(lastData), end(lastData));
 
     return ret;
