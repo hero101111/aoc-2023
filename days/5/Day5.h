@@ -85,10 +85,10 @@ public:
           // apply transformation
 
           DataType prevType = (DataType)(crtType - 1);
-          list<LLX> vec;
+          //list<LLX> vec;
           //vec.reserve(world[prevType].size());
-          auto & prevData = world[prevType];
-          for (auto s : prevData)
+          auto & prevData = world[Seed];
+          for (auto & s : prevData)
           {
             auto s2 = s;
             for (auto m : mappings)
@@ -99,10 +99,10 @@ public:
                 break;
               }
             }
-            vec.push_back(s2);
+            s = s2;
           }
-          world[crtType] = vec;
-          world[prevType] = {};
+          //world[crtType] = vec;
+          //world[prevType] = {};
         }
         mappings.clear();
         if (crtType == DataType::Location)
@@ -129,7 +129,7 @@ public:
      // cout << d << endl;
     }
 
-    auto lastData = world[DataType::Location];
+    auto lastData = world[DataType::Seed];
     ret = *min_element(begin(lastData), end(lastData));
 
     return ret;
