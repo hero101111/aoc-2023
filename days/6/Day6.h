@@ -27,7 +27,26 @@ public:
 
   LL DoWork1()
   {
-    LL ret = 61;
+    LL ret = 1;
+    auto tData = RegExMatchN(mData[0], R"(\d+)");
+    auto dData = RegExMatchN(mData[1], R"(\d+)");
+
+
+    for (int i = 0; i < tData.size(); ++i)
+    {
+      int ways = 0;
+      LL t = stoll(tData[i]);
+      LL target = stoll(dData[i]);
+
+      for (LL j = 0; j <= t; ++j)
+      {
+        LL T = (t - j) * j;
+        if (T > target)
+          ways++;
+      }
+      return ways;
+      ret *= ways;
+    }
     return ret;
   }
 
@@ -53,7 +72,7 @@ public:
 
   bool Test() override
   {
-    mCurrentInput = "test";
+  //  mCurrentInput = "test";
     //assert(Part1() != "");
     //assert(Part2() != "");
     return true;
