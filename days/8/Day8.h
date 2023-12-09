@@ -59,32 +59,51 @@ public:
         nodeV.push_back(k);
     }
 
-    LL steps = 0;
-    int crtI = 0;
-    while (true)
+    vector<LL> calc;
+    for (int t = 0; t < nodeV.size(); ++t)
     {
-      for (auto node : nodeV)
+      LL steps = 0;
+      int crtI = 0;
+      while (true)
       {
-        while (node != "ZZZ")
+        bool allOk = true;
+
+        auto& node = nodeV[t];
+        //for (auto& node : nodeV)
         {
+         // cout << node << " ";
           bool goLeft = firstLine[crtI] == 'L';
           if (goLeft)
             node = nodes[node].left;
           else
             node = nodes[node].right;
 
-          steps++;
-
-          if (node == "ZZZ")
-            break;
-
-          crtI += 1;
-          if (crtI > firstLine.size() - 1)
-            crtI = 0;
+          if (node.back() != 'Z')
+            allOk = false;
         }
+       // cout << endl;
+
+        steps++;
+
+        if (allOk)
+        {
+          calc.push_back(steps);
+          break;
+        }
+
+        crtI += 1;
+        if (crtI > firstLine.size() - 1)
+          crtI = 0;
       }
+      ret = steps;
     }
-    ret = steps;
+
+    ret = 1;
+    for (int i = 0; i < calc.size(); ++i)
+      ret = lcm(ret, calc[i]);
+
+    ofstream f("kek.out");
+    f << ret;
     return ret;
   }
 
@@ -111,7 +130,7 @@ public:
   bool Test() override
   {
     mCurrentInput = "test";
-    //assert(Part1() != "");
+   // assert(Part1() != "");
     //assert(Part2() != "");
     return true;
   }
