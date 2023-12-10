@@ -15,7 +15,7 @@ private:
 
 public:
 
-  Day10(){ }
+  Day10() { }
 
   ~Day10() override { }
 
@@ -63,7 +63,7 @@ public:
         }
         if (i == 3 && (c == '|' || c == 'F' || c == '7')) //up
         {
-          crtDir = 3;
+
           if (c != '-')
             crtDir = c == 'F' ? 0 : 2;
           loopPts.push_back(nextP);
@@ -100,7 +100,7 @@ public:
       }
     }
   }
-  
+
   string GetDay() override
   {
     return "10";
@@ -115,7 +115,20 @@ public:
 
   LL DoWork2()
   {
-    DynamicMap<char> m2 = m;
+    DynamicMap<char> m2;
+    for (auto i : rangeint(0, m.max_x * 2))
+      for (auto j : rangeint(0, m.max_y * 2))
+        m2[{i, j}] = '.';
+
+    m2[startP * 2] = '.';
+
+    for (int i : rangeint(1, loopPts.size() - 1))
+    {
+      m2[loopPts[i - 1] + loopPts[i]] = 'Z';
+      m2[loopPts[i] + loopPts[i]] = 'Z';
+    }
+
+    //m2.printf(KVERBOSE);
 
     unordered_set<Point> crtS;
     for (int i : m2.range_y())
@@ -131,7 +144,7 @@ public:
       if (m2[{i, 0}] == '.')
         crtS.insert(Point{ i, 0 });
       if (m2[{i, m2.max_y}] == '.')
-        crtS.insert(Point{ i, m2.max_y});
+        crtS.insert(Point{ i, m2.max_y });
     }
 
     unordered_set<Point> nextS;
@@ -155,17 +168,17 @@ public:
       if (crtS.empty())
         break;
     }
-    
+
     LL ret = 0;
-    for (int x : rangeint(0, m2.max_x - 1))
+    for (int x : rangeint(0, m2.max_x, 2))
     {
-      for (int y : rangeint(0, m2.max_y - 1))
+      for (int y : rangeint(0, m2.max_y, 2))
         ret += m2[{x, y}] == '.';
     }
 
     return ret;
   }
-  
+
   string Part1() override
   {
     ReadData();
