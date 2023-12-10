@@ -39,6 +39,7 @@ public:
         char c = m[nextP];
         if (i == 0 && (c == '-' || c == 'J' || c == '7')) // right
         {
+          crtDir = 0;
           if (c != '-')
             crtDir = c == 'J' ? 3 : 1;
           loopPts.push_back(nextP);
@@ -46,6 +47,7 @@ public:
         }
         if (i == 1 && (c == '|' || c == 'L' || c == 'J')) //down
         {
+          crtDir = 1;
           if (c != '-')
             crtDir = c == 'L' ? 0 : 2;
           loopPts.push_back(nextP);
@@ -53,6 +55,7 @@ public:
         }
         if (i == 2 && (c == '-' || c == 'F' || c == 'L')) //left
         {
+          crtDir = 2;
           if (c != '-')
             crtDir = c == '7' ? 1 : 3;
           loopPts.push_back(nextP);
@@ -60,6 +63,7 @@ public:
         }
         if (i == 3 && (c == '|' || c == 'F' || c == '7')) //up
         {
+          crtDir = 3;
           if (c != '-')
             crtDir = c == 'F' ? 0 : 2;
           loopPts.push_back(nextP);
