@@ -111,20 +111,7 @@ public:
 
   LL DoWork2()
   {
-    DynamicMap<char> m2;
-    for (auto i : rangeint(0, m.max_x * 2))
-      for (auto j : rangeint(0, m.max_y * 2))
-        m2[{i, j}] = '.';
-
-    m2[startP * 2] = '.';
-
-    for (int i : rangeint(1, loopPts.size() - 1))
-    {
-      Point p = loopPts[i];
-      Point p2 = loopPts[i - 1] + p;
-      m2[p2] = 'Z';
-      m2[p * 2] = 'Z';
-    }
+    DynamicMap<char> m2 = m;
 
     unordered_set<Point> crtS;
     for (int i : m2.range_y())
@@ -166,9 +153,9 @@ public:
     }
     
     LL ret = 0;
-    for (int x = 0; x < m2.max_x; x += 2)
+    for (int x : rangeint(0, m2.max_x - 1))
     {
-      for (int y = 0; y < m2.max_y; y += 2)
+      for (int y : rangeint(0, m2.max_y - 1))
         ret += m2[{x, y}] == '.';
     }
 
