@@ -1858,10 +1858,12 @@ struct hash<Point>
   }
 };
 
-auto rangeint(long long from, long long to) -> vector<long long>
+auto rangeint(long long from, long long to, long long step = 1) -> vector<long long>
 {
-  vector<long long> ret(to - from + 1);
-  iota(begin(ret), end(ret), from);
+  vector<long long> ret;
+  ret.reserve(to - from + 1);
+  for (; from <= to; from += step)
+    ret.push_back(from);
   return ret;
 }
 
