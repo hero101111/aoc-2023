@@ -40,32 +40,28 @@ public:
         if (i == 0 && (c == '-' || c == 'J' || c == '7')) // right
         {
           crtDir = 0;
-          if (c != '-')
-            crtDir = c == 'J' ? 3 : 1;
+          if (c != '-') crtDir = c == 'J' ? 3 : 1;
           loopPts.push_back(nextP);
           break;
         }
         if (i == 1 && (c == '|' || c == 'L' || c == 'J')) //down
         {
           crtDir = 1;
-          if (c != '-')
-            crtDir = c == 'L' ? 0 : 2;
+          if (c != '-') crtDir = c == 'L' ? 0 : 2;
           loopPts.push_back(nextP);
           break;
         }
         if (i == 2 && (c == '-' || c == 'F' || c == 'L')) //left
         {
           crtDir = 2;
-          if (c != '-')
-            crtDir = c == '7' ? 1 : 3;
+          if (c != '-') crtDir = c == '7' ? 1 : 3;
           loopPts.push_back(nextP);
           break;
         }
         if (i == 3 && (c == '|' || c == 'F' || c == '7')) //up
         {
-
-          if (c != '-')
-            crtDir = c == 'F' ? 0 : 2;
+          crtDir = 3;
+          if (c != '-') crtDir = c == 'F' ? 0 : 2;
           loopPts.push_back(nextP);
         }
       }
@@ -120,8 +116,6 @@ public:
       for (auto j : rangeint(0, m.max_y * 2))
         m2[{i, j}] = '.';
 
-    m2[startP * 2] = '.';
-
     for (int i : rangeint(1, loopPts.size() - 1))
     {
       m2[loopPts[i - 1] + loopPts[i]] = 'Z';
@@ -130,42 +124,41 @@ public:
 
     //m2.printf(KVERBOSE);
 
-    unordered_set<Point> crtS;
+    unordered_set<Point> toFlood;
     for (int i : m2.range_y())
     {
       if (m2[{0, i}] == '.')
-        crtS.insert(Point{ 0, i });
+        toFlood.insert(Point{ 0, i });
       if (m2[{m2.max_x, i}] == '.')
-        crtS.insert(Point{ m2.max_x, i });
+        toFlood.insert(Point{ m2.max_x, i });
     }
 
     for (int i : m2.range_x())
     {
       if (m2[{i, 0}] == '.')
-        crtS.insert(Point{ i, 0 });
+        toFlood.insert(Point{ i, 0 });
       if (m2[{i, m2.max_y}] == '.')
-        crtS.insert(Point{ i, m2.max_y });
+        toFlood.insert(Point{ i, m2.max_y });
     }
 
-    unordered_set<Point> nextS;
     while (true)
     {
-      for (auto p : crtS)
+      unordered_set<Point> shouldFlood;
+      for (auto p : toFlood)
       {
         for (auto d : dirV)
         {
           Point cand = p + d;
-          if (m2.isSetAt(cand) && m2[cand] == '.')
+          if (m2.hasAt(cand, '.'))
           {
             m2[cand] = 'Z';
-            nextS.insert(cand);
+            shouldFlood.insert(cand);
           }
         }
       }
-      crtS = nextS;
-      nextS.clear();
+      toFlood = shouldFlood;
 
-      if (crtS.empty())
+      if (toFlood.empty())
         break;
     }
 
