@@ -2,16 +2,15 @@
 
 #include "SolutionDay.h"
 
-using MT = pair<string, vector<LL>>;
+using MT = pair<LL, LL>;
 
 template <>
 struct hash<MT>
 {
   auto operator()(const MT & k) const -> std::size_t
   {
-    string s = k.first;
-    for (auto ss : k.second)
-      s += "_" + to_string(ss);
+    string s = to_string(k.first);
+    s += "_" + to_string(k.second);
 
     return hash<string>()(s);
   }
@@ -111,25 +110,24 @@ public:
     return true;
   }
 
-  LL solve(string p, vector<LL> extra)
+  LL solve(string p, vector<LL> & extra, LL pI, LL eI)
   {
-    if (extra.empty())
+    if (eI >= extra.size())
       return 0;
-    if (cache.contains(make_pair(p, extra)))
-      return cache[make_pair(p, extra)];
+    if (cache.contains(make_pair(pI, eI)))
+      return cache[make_pair(pI, eI)];
 
-    auto f = extra.front();
-    extra.erase(begin(extra));
+    auto f = extra[eI++];
 
     vector<int> cand;
 
     if (p.size() < f + 1)
       return 0;
 
-    for (LL i = 0; i < p.size() - f - 1; ++i)
+    for (LL i = pI; i <= p.size() - f - 1; ++i)
     {
       bool done = false;
-      for (LL j = 0; j < i; ++j)
+      for (LL j = pI; j < i; ++j)
         if (p[j] == '#')
         {
           done = true;
@@ -153,18 +151,18 @@ public:
       string candP = p.substr(i, f + 2);
 
       string restP = p.substr(i + f + 1);
-      auto   p2    = p.substr(0, i) + candP + restP.substr(1);
+      auto   p2    = p.substr(0, i) + candP + (restP.empty() ? "" : restP.substr(1));
       assert(p2 == p);
 
       LL toAdd = 0;
-      if (extra.empty())
+      if (eI >= extra.size())
       {
         if (!restP.contains('#'))
           ret += 1;
       }
       else
       {
-        ret += solve(restP, extra);
+        ret += solve(p, extra, i + f + 1, eI);
       }
     }
 
@@ -172,8 +170,7 @@ public:
     {
       int ___ = 1;
     }
-    extra.push_back(f);
-    cache[make_pair(p, extra)] = ret;
+    cache[make_pair(pI, eI - 1)] = ret;
     return ret;
   }
 
@@ -187,9 +184,9 @@ public:
     // auto b2 = evalP("..#...#...###.", vector<LL>{ 1, 1, 3 });
     for (auto d : mData)
     {
-      // d = "?###???????? 3,2,1"s;  // 10
-      //  d = "????.######..#####. 1,6,5"s;  // 4
-      cout << d << endl;
+       //d = "?###???????? 3,2,1"s;  // 10
+        //d = "????.######..#####. 1,6,5"s;  // 4
+      //cout << d << endl;
       cache.clear();
 
       auto [pattern, extra] = split(d, ' ');
@@ -208,7 +205,7 @@ public:
       }
       pattern = '.' + pattern;  // padding begin
       pattern += '.';           // padding end
-      t += solve(pattern, extraV);
+      t += solve(pattern, extraV, 0, 0);
       int __ = 0;
     }
     cout << "T: " << t << endl;
