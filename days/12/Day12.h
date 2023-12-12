@@ -94,9 +94,8 @@ public:
 
   unordered_map<MT, LL> cache;
 
-  bool isGood(string pp)
+  bool IsValidPattern(string pp)
   {
-    // assert(pp.size() >= 3);
     if (pp.size() < 3)
       return false;
 
@@ -110,25 +109,25 @@ public:
     return true;
   }
 
-  LL solve(string p, const vector<LL> & extra, LL pI, LL eI)
+  LL SolveRow(string row, const vector<LL> & damaged, LL rowIndex, LL damagedIndex)
   {
-    if (eI >= extra.size())
+    if (damagedIndex >= damaged.size())
       return 0;
-    if (cache.contains(make_pair(pI, eI)))
-      return cache[make_pair(pI, eI)];
+    if (cache.contains(make_pair(rowIndex, damagedIndex)))
+      return cache[make_pair(rowIndex, damagedIndex)];
 
-    auto f = extra[eI++];
+    auto crtRowChar = damaged[damagedIndex++];
 
     vector<int> cand;
 
-    if (p.size() < f + 1)
+    if (row.size() < crtRowChar + 1)
       return 0;
 
-    for (LL i = pI; i <= p.size() - f - 1; ++i)
+    for (LL i = rowIndex; i < row.size() - crtRowChar - 1; ++i)
     {
       bool done = false;
-      for (LL j = pI; j < i; ++j)
-        if (p[j] == '#')
+      for (LL j = rowIndex; j < i; ++j)
+        if (row[j] == '#')
         {
           done = true;
           break;
@@ -136,24 +135,20 @@ public:
       if (done)
         break;
 
-      string candP = p.substr(i, f + 2);
-      if (isGood(candP))
-      {
+      string candP = row.substr(i, crtRowChar + 2);
+      if (IsValidPattern(candP))
         cand.push_back(i);
-
-        int __ = 0;
-      }
     }
 
     LL ret = 0;
     for (auto i : cand)
     {
       LL toAdd = 0;
-      if (eI >= extra.size())
+      if (damagedIndex >= damaged.size())
       {
         bool isGood = true;
-        for (int k = i + f + 1; k < p.size(); ++k)
-          if (p[k] == '#')
+        for (int k = i + crtRowChar + 1; k < row.size(); ++k)
+          if (row[k] == '#')
           {
             isGood = false;
             break;
@@ -163,42 +158,29 @@ public:
       }
       else
       {
-        ret += solve(p, extra, i + f + 1, eI);
+        ret += SolveRow(row, damaged, i + crtRowChar + 1, damagedIndex);
       }
     }
-
-    if (p.size() == f && ret > 0)
-    {
-      int ___ = 1;
-    }
-    //  cache[make_pair(pI, eI - 1)] = ret;
+    cache[make_pair(rowIndex, damagedIndex - 1)] = ret;
     return ret;
   }
 
-  LL DoWork1(bool partTwo)
+  LL DoWork(bool partTwo)
   {
-    LL t = 0;
+    LL ret = 0;
 
-    // auto b = evalP(".#.###.#.######"s, vector<LL>{ 1, 3, 1, 6 });
-
-    // auto b2 = evalP(".??..??...?##.", vector<LL>{ 1, 1, 3});
-    // auto b2 = evalP("..#...#...###.", vector<LL>{ 1, 1, 3 });
     for (auto d : mData)
     {
-      // d = "?###???????? 3,2,1"s;  // 10
-      // d = "????.######..#####. 1,6,5"s;  // 4
-      // cout << d << endl;
       cache.clear();
 
       auto [pattern, extra] = split(d, ' ');
 
       auto extraV = stoll(tok(extra, ','));
 
-      auto pat2 = pattern;
-      auto ex2  = extraV;
-
       if (partTwo)
       {
+        auto pat2 = pattern;
+        auto ex2  = extraV;
         for (auto i : rangeint(1, 4))
         {
           pattern += "?";
@@ -209,16 +191,10 @@ public:
       }
       pattern = '.' + pattern;  // padding begin
       pattern += '.';           // padding end
-      t += solve(pattern, extraV, 0, 0);
+      ret += SolveRow(pattern, extraV, 0, 0);
       int __ = 0;
     }
-    cout << "T: " << t << endl;
-    return t;
-  }
-
-  LL DoWork2()
-  {
-    LL ret = 122;
+    cout << "T: " << ret << endl;
     return ret;
   }
 
@@ -226,14 +202,14 @@ public:
   {
     ReadData();
 
-    return std::to_string(DoWork1(false));
+    return std::to_string(DoWork(false));
   }
 
   string Part2() override
   {
     ReadData();
 
-    return std::to_string(DoWork1(true));
+    return std::to_string(DoWork(true));
   }
 
   bool Test() override
@@ -241,6 +217,9 @@ public:
     mCurrentInput = "test";
     aoc_assert(Part1(), "21"s);
     aoc_assert(Part2(), "525152"s);
+    mCurrentInput = "input";
+    aoc_assert(Part1(), "7260"s);
+    aoc_assert(Part2(), "1909291258644"s);
     return true;
   }
 };
