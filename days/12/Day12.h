@@ -26,64 +26,6 @@ public:
 
   ~Day12() override {}
 
-  int findQ(string p)
-  {
-    for (int i = 0; i < p.size(); ++i)
-      if (p[i] == '?')
-        return i;
-    return -1;
-  }
-
-  bool evalP(string p, const vector<LL> & extra, bool * aShortcuit)
-  {
-    int crtFound = 0;
-    if (aShortcuit)
-      *aShortcuit = false;
-
-    // if (findQ(p) >= 0)
-    //   return false;
-
-    p += "E";
-    int extraPos = 0;
-
-    for (auto c : p)
-    {
-      if (c == '?' && aShortcuit != nullptr)
-        return false;
-
-      if (c == '#')
-      {
-        crtFound++;
-      }
-      if (c == '.' || c == 'E')
-      {
-        if (crtFound > 0 && extraPos >= extra.size())
-        {
-          if (aShortcuit)
-            *aShortcuit = true;
-          return false;
-        }
-
-        if (crtFound > 0 && extra[extraPos] != crtFound)
-        {
-          if (c != 'E')
-            if (aShortcuit)
-              *aShortcuit = true;
-          return false;
-        }
-
-        if (crtFound > 0 && extraPos < extra.size())
-          extraPos += 1;
-
-        crtFound = 0;
-      }
-    }
-    if (extraPos < extra.size())
-      return false;
-
-    return true;
-  }
-
   void ReadData()
   {
     mData.clear();
