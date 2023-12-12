@@ -110,7 +110,7 @@ public:
     return true;
   }
 
-  LL solve(string p, vector<LL> & extra, LL pI, LL eI)
+  LL solve(string p, const vector<LL> & extra, LL pI, LL eI)
   {
     if (eI >= extra.size())
       return 0;
@@ -148,17 +148,18 @@ public:
     LL ret = 0;
     for (auto i : cand)
     {
-      string candP = p.substr(i, f + 2);
-
-      string restP = p.substr(i + f + 1);
-      auto   p2    = p.substr(0, i) + candP + (restP.empty() ? "" : restP.substr(1));
-      assert(p2 == p);
-
       LL toAdd = 0;
       if (eI >= extra.size())
       {
-        if (!restP.contains('#'))
-          ret += 1;
+        bool isGood = true;
+        for (int k = i + f + 1; k < p.size(); ++k)
+          if (p[k] == '#')
+          {
+            isGood = false;
+            break;
+          }
+
+        ret += isGood ? 1 : 0;
       }
       else
       {
@@ -170,11 +171,11 @@ public:
     {
       int ___ = 1;
     }
-    cache[make_pair(pI, eI - 1)] = ret;
+    //  cache[make_pair(pI, eI - 1)] = ret;
     return ret;
   }
 
-  LL DoWork1()
+  LL DoWork1(bool partTwo)
   {
     LL t = 0;
 
@@ -184,9 +185,9 @@ public:
     // auto b2 = evalP("..#...#...###.", vector<LL>{ 1, 1, 3 });
     for (auto d : mData)
     {
-       //d = "?###???????? 3,2,1"s;  // 10
-        //d = "????.######..#####. 1,6,5"s;  // 4
-      //cout << d << endl;
+      // d = "?###???????? 3,2,1"s;  // 10
+      // d = "????.######..#####. 1,6,5"s;  // 4
+      // cout << d << endl;
       cache.clear();
 
       auto [pattern, extra] = split(d, ' ');
@@ -196,12 +197,15 @@ public:
       auto pat2 = pattern;
       auto ex2  = extraV;
 
-      for (auto i : rangeint(1, 4))
+      if (partTwo)
       {
-        pattern += "?";
-        pattern += pat2;
-        for (auto e : ex2)
-          extraV.push_back(e);
+        for (auto i : rangeint(1, 4))
+        {
+          pattern += "?";
+          pattern += pat2;
+          for (auto e : ex2)
+            extraV.push_back(e);
+        }
       }
       pattern = '.' + pattern;  // padding begin
       pattern += '.';           // padding end
@@ -222,21 +226,21 @@ public:
   {
     ReadData();
 
-    return std::to_string(DoWork1());
+    return std::to_string(DoWork1(false));
   }
 
   string Part2() override
   {
     ReadData();
 
-    return std::to_string(DoWork2());
+    return std::to_string(DoWork1(true));
   }
 
   bool Test() override
   {
     mCurrentInput = "test";
-    assert(Part1() != "");
-    //  assert(Part2() != "");
+    aoc_assert(Part1(), "21"s);
+    aoc_assert(Part2(), "525152"s);
     return true;
   }
 };
