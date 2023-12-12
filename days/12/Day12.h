@@ -22,35 +22,39 @@ public:
     return -1;
   }
 
-  bool evalP(string p, vector<LL> extra)
+  bool evalP(string p, const vector<LL> & extra, bool preeval = false)
   {
     int crtFound = 0;
 
-    if (findQ(p) >= 0)
-      return false;
+    //if (findQ(p) >= 0)
+    //  return false;
 
     p += "E";
+    int extraPos = 0;
+
     for (auto c : p)
     {
       if (c == '#')
       {
         crtFound++;
       }
+      if (preeval && c == '?')
+        return true;
       if (c == '.' || c == 'E')
       {
-        if (crtFound > 0 && extra.empty())
+        if (crtFound > 0 && extraPos >= extra.size())
           return false;
 
-        if (crtFound > 0 && extra.front() != crtFound)
+        if (crtFound > 0 && extra[extraPos] != crtFound)
           return false;
 
-        if (crtFound > 0 && !extra.empty())
-          extra.erase(begin(extra));
+        if (crtFound > 0 && extraPos < extra.size())
+          extraPos += 1;
         
         crtFound = 0;
       }
     }
-    if (extra.size() > 0)
+    if (extraPos < extra.size())
       return false;
 
     return true;
@@ -60,9 +64,7 @@ public:
   void ReadData()
   {
     mData.clear();
-    mData = rff(GetInputPath());
-
-    
+    mData = rff(GetInputPath());    
   }
   
   string GetDay() override
@@ -80,8 +82,22 @@ public:
     auto b2 = evalP("..#...#...###.", vector<LL>{ 1, 1, 3});
     for (auto d : mData)
     {
+      cout << d << endl;
+
       auto [pattern, extra] = split(d, ' ');
+
       auto extraV = stoll(tok(extra, ','));
+
+      auto pat2 = pattern;
+      auto ex2 = extraV;
+
+      for (auto i : rangeint(1, 4))
+      {
+        pattern += "?";
+        pattern += pat2;
+        for (auto e : ex2)
+          extraV.push_back(e);
+      }
       map<int, int> pm;
       int totalQ = 0;
       for (int i = 0; i < pattern.size(); ++i)
@@ -95,13 +111,6 @@ public:
       {
         auto crtTop = crtS.top();
 
-
-        if (evalP(crtTop, extraV))
-        {
-         // cout << "YO   " << crtTop << endl;
-          t++;
-        }
-
         crtS.pop();
 
         auto firstQ = findQ(crtTop);
@@ -109,16 +118,26 @@ public:
         {
           string newPattern1 = crtTop;
           string newPattern2 = crtTop;
-          /*  if (crtTop.second < totalQ)
-              newPattern[pm[crtTop.second]] = '#';*/
 
-          auto it = crtTop.find('?');
-          if (it != string::npos)
+          bool pev = evalP(crtTop, extraV, true);
+          if (pev)
           {
-            newPattern1[firstQ] = '#';
-            newPattern2[firstQ] = '.';
-            crtS.push(newPattern1);
-            crtS.push(newPattern2);
+            auto it = crtTop.find('?');
+            if (it != string::npos)
+            {
+              newPattern1[firstQ] = '#';
+              newPattern2[firstQ] = '.';
+              crtS.push(newPattern1);
+              crtS.push(newPattern2);
+            }
+          }
+        }
+        else
+        {
+          if (evalP(crtTop, extraV, false))
+          {
+            // cout << "YO   " << crtTop << endl;
+            t++;
           }
         }
 
@@ -126,6 +145,7 @@ public:
           break;
       }
     }
+    cout << "T: " << t << endl;
     return t;
   }
 
@@ -152,7 +172,7 @@ public:
   bool Test() override
   {
     mCurrentInput = "test";
-   // assert(Part1() != "");
+    assert(Part1() != "");
     //assert(Part2() != "");
     return true;
   }
