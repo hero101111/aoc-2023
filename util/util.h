@@ -991,7 +991,7 @@ auto RegExMatchN(string s, string regexExp) -> vector<string>
 
 auto RegExMatch1(string s, string regex) -> string
 {
-  auto          data = RegexMatch(s, regex);
+  auto data = RegexMatch(s, regex);
   return data[0];
 }
 
@@ -1455,6 +1455,19 @@ public:
   [[nodiscard]] auto height() const -> long long { return empty() ? 0 : abs(max_y - min_y) + 1; }
 
   void clear() { *this = DynamicMap<T>(); }
+
+  bool isOnEdge(Point p)
+  {
+    if (p.x == min_x)
+      return true;
+    if (p.y == min_y)
+      return true;
+    if (p.x == max_x)
+      return true;
+    if (p.y == max_y)
+      return true;
+    return false;
+  }
 
   auto for_each(function<bool(T)> func) -> size_t
   {
