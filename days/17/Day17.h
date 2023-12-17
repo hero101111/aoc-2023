@@ -66,82 +66,7 @@ public:
 
   string GetDay() override { return "17"; }
 
-  LL walk(MT pd, DynamicMap<int> & m, vector<MT> crt)
-  {
-    int  ret = 0;
-    auto p   = pd.first;
-    auto d   = pd.second;
-
-    ret += m[p];
-    crt.push_back(pd);
-
-    if (p == Point{ m.max_x, m.max_y })
-    {
-      return ret;
-    }
-
-    auto canGo = [&](MT where)
-    {
-      if (!m.isSetAt(where.first))
-        return false;
-
-      auto f = find_if(begin(crt), end(crt),
-                       [&](auto it)
-                       {
-                         return it.first == where.first;
-                       });
-      if (f != end(crt))
-        return false;
-
-      int  t  = 0;
-      auto it = crt.size();
-      // MT   startPD = crt.back();
-      while (true)
-      {
-        if (it == 0)
-          break;
-        it--;
-        int dist = crt.size() - it;
-        if (where.second != crt[it].second)
-          break;
-        if (dist > 2)
-          return false;
-      }
-      return true;
-    };
-
-    auto neigh = vector<pair<Point, Point>>{ make_pair(p + d, d) };
-    if (d == Point::OriginRight() || d == Point::OriginLeft())
-    {
-      auto d1 = Point::OriginUp();
-      auto d2 = Point::OriginDown();
-      neigh.push_back(make_pair(p + d1, d1));
-      neigh.push_back(make_pair(p + d2, d2));
-    };
-    if (d == Point::OriginDown() || d == Point::OriginUp())
-    {
-      auto d1 = Point::OriginLeft();
-      auto d2 = Point::OriginRight();
-      neigh.push_back(make_pair(p + d1, d1));
-      neigh.push_back(make_pair(p + d2, d2));
-    };
-
-    LL minWalk = numeric_limits<int>::max();
-    for (auto n : neigh)
-    {
-      if (!canGo(n))
-        continue;
-
-      LL w = walk(n, m, crt);
-      if (w < minWalk)
-        minWalk = w;
-    }
-    if (minWalk != numeric_limits<int>::max())
-      ret += minWalk;
-
-    return ret;
-  }
-  LL DoWork1()
+  LL DoWork(bool partTwo)
   {
     LL               ret = 0;
     DynamicMap<char> m_;
@@ -154,20 +79,18 @@ public:
         m[p] = c - '0';
       }));
 
-    Point start;
-    Point finish{ m.max_x, m.max_y };
-
     vector<MT> v;
-    // ret = walk(make_pair(Point{}, Point::OriginRight()), m, v);
 
-    Graph<DT> g(mData.size() * mData.size() * 4 * 3 * 3);
+    int MOVELIM = partTwo ? 10 : 3;
+    int MINLIM  = partTwo ? 3 : 0;
+
+    Graph<DT> g(mData.size() * mData.size() * 4 * MOVELIM * MOVELIM);
     m.for_each(
       [&](Point p, int c)
       {
-        cout << p.ToString() << " ";
         auto neigh = p.GetDirectNeighbours();
 
-        for (int t = 0; t < 3; ++t)
+        for (int t = 0; t < MOVELIM; ++t)
         {
           for (auto n : neigh)
           {
@@ -178,7 +101,7 @@ public:
             crt.dir = dir;
             crt.t   = t;
 
-            if (t < 3)
+            if (t < MOVELIM)
             {
               DT nx;
               nx.p   = n;
@@ -189,6 +112,7 @@ public:
                 g.AddEdge(crt, nx, m[nx.p]);
             }
 
+            if (t >= MINLIM)
             {
               auto neighV = vector<pair<Point, Point>>{};
               if (dir == Point::OriginRight() || dir == Point::OriginLeft())
@@ -218,6 +142,7 @@ public:
           }
         }
       });
+    // cout << "Constructed graph";
 
     vector<DT> startNodes;
     vector<DT> destNodes;
@@ -234,7 +159,7 @@ public:
       if (m.isSetAt(nx))
         startNodes.push_back(start);
 
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < MOVELIM; ++i)
       {
         if (dir != Point::OriginLeft() && dir != Point::OriginUp())
         {
@@ -257,21 +182,15 @@ public:
 
         if (distMap.contains(d))
         {
-          cout << "A: " << distMap[d] << endl;
+          // cout << "A: " << distMap[d] << endl;
           if (distMap[d] < ret)
             ret = distMap[d];
         }
       }
     }
 
-    cout << "T: " << ret << endl;
+    // cout << "T: " << ret << endl;
 
-    return ret;
-  }
-
-  LL DoWork2()
-  {
-    LL ret = 172;
     return ret;
   }
 
@@ -279,21 +198,24 @@ public:
   {
     ReadData();
 
-    return std::to_string(DoWork1());
+    return std::to_string(DoWork(false));
   }
 
   string Part2() override
   {
     ReadData();
 
-    return std::to_string(DoWork2());
+    return std::to_string(DoWork(true));
   }
 
   bool Test() override
   {
     mCurrentInput = "test";
-    assert(Part1() != "");
-    // assert(Part2() != "");
+    aoc_assert(Part1(), "102"s);
+    aoc_assert(Part2(), "94"s);
+    mCurrentInput = "input";
+    aoc_assert(Part1(), "1008"s);
+    aoc_assert(Part2(), "1210"s);
     return true;
   }
 };
