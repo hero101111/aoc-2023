@@ -1823,6 +1823,7 @@ struct objmap
 {
   int                   crtIndex{ 0 };
   unordered_map<T, int> mapping;
+  unordered_map<int, T> revMapping;
 
   auto add(const T & obj) -> int
   {
@@ -1832,7 +1833,8 @@ struct objmap
       return found->second;
     }
 
-    mapping[obj] = crtIndex;
+    mapping[obj]         = crtIndex;
+    revMapping[crtIndex] = obj;
     return crtIndex++;
   }
 
@@ -1842,12 +1844,9 @@ struct objmap
 
   auto translate(int index) -> T
   {
-    for (auto m : mapping)
+    if (revMapping.contains(index))
     {
-      if (m.second == index)
-      {
-        return m.first;
-      }
+      return revMapping[index];
     }
     return T();
   }
@@ -2098,7 +2097,7 @@ private:
     }
   }
 
-  auto GetDistances(int src) -> map<int, int>
+  auto GetDistances(int src) -> unordered_map<int, int>
   {
     priority_queue<WeightNodePair, vector<WeightNodePair>, greater<WeightNodePair>> pq;
 
@@ -2125,7 +2124,7 @@ private:
       }
     }
 
-    map<int, int> distanceMap;
+    unordered_map<int, int> distanceMap;
     for (int i = 0; i < vertexCount; ++i)
       distanceMap[i] = dist[i];
     return distanceMap;
@@ -2301,10 +2300,10 @@ public:
     return ClearEdge(mapper[node1], mapper[node2]);
   }
 
-  auto GetDistances(const T & src) -> map<T, int>
+  auto GetDistances(const T & src) -> unordered_map<T, int>
   {
-    map<T, int> ret;
-    auto        dist = GetDistances(mapper[src]);
+    unordered_map<T, int> ret;
+    auto                  dist = GetDistances(mapper[src]);
     for (auto d : dist)
       ret[mapper.translate(d.first)] = d.second;
     return ret;
