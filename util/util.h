@@ -472,6 +472,11 @@ struct Point
 
   [[nodiscard]] auto DownRight() const -> Point { return Point{ x + 1, y + 1, z, w }; }
 
+  static auto OriginDown() -> Point { return Point{}.Down(); }
+  static auto OriginUp() -> Point { return Point{}.Up(); }
+  static auto OriginLeft() -> Point { return Point{}.Left(); }
+  static auto OriginRight() -> Point { return Point{}.Right(); }
+
   enum class Axis
   {
     X = 0,
