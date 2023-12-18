@@ -91,10 +91,57 @@ public:
 
   LL DoWork2()
   {
-    LL ret = 182;
+    LL ret = 0;
+
+    vector<Point> perimeterPoints;
+    LL            perimeterLength = 0;
+
+    DynamicMap<char> m;
+    Point            p;
+    m[p] = '#';
+    for (auto d : mData)
+    {
+      auto   v   = tok(d, ' ');
+      string hex = v[2];
+      char   dir;
+      hex.pop_back();
+      hex.erase(begin(hex));
+      switch (hex.back())
+      {
+      case '0':
+        dir = 'R';
+        break;
+      case '1':
+        dir = 'D';
+        break;
+      case '2':
+        dir = 'L';
+        break;
+      case '3':
+        dir = 'U';
+        break;
+      default:
+        assert(!"invalid");
+      }
+      hex.pop_back();
+      hex.erase(begin(hex));
+      LL len = stoll(hex, nullptr, 16);
+
+      p = p + Point{}.FromDirection(dir) * len;
+
+      perimeterLength += len;
+      perimeterPoints.push_back(p);
+    }
+
+    LL area = 0;
+    for (int i = 0; i < perimeterPoints.size() - 1; ++i)
+    {
+      area += (perimeterPoints[i].y + perimeterPoints[i + 1].y) *
+              (perimeterPoints[i].x - perimeterPoints[i + 1].x);
+    }
+    ret = area / 2 + perimeterLength / 2 + 1;
     return ret;
   }
-
   string Part1() override
   {
     ReadData();
