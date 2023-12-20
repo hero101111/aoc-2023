@@ -99,6 +99,7 @@ public:
     DynamicMap<char> m;
     Point            p;
     m[p] = '#';
+
     for (auto d : mData)
     {
       auto   v   = tok(d, ' ');

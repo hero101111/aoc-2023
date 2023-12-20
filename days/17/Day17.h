@@ -9,23 +9,6 @@ struct DT  // loc, dir, howLong
   int   t;
 
   // bool operator==(const DT & other) { return p == other.p && dir == other.dir && t == other.t; }
-
-  bool operator<(const DT & other) const
-  {
-    if (p < other.p)
-      return true;
-    else if (p == other.p)
-    {
-      if (dir < other.dir)
-        return true;
-      else if (dir == other.dir)
-      {
-        if (t < other.t)
-          return true;
-      }
-    }
-    return false;
-  }
 };
 
 bool operator==(const DT & a, const DT & b)
