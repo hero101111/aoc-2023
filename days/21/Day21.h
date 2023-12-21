@@ -20,7 +20,7 @@ public:
 
   string GetDay() override { return "21"; }
 
-  LL DoWork1()
+  LL DoWork(bool partTwo)
   {
     LL ret = 0;
 
@@ -37,22 +37,9 @@ public:
         }
       });
 
-    auto hasMapAt = [&](DynamicMap<char> & m, Point p, char c)
-    {
-      Point p2 = p;
-      if (p.x < 0)
-        p2.x = m.max_x - p.x % m.size_x() - 1;
-      if (p.x > m.max_x)
-        p2.x = p.x % m.size_x();
+    LL f0, f1, f2;
 
-      if (p.y < 0)
-        p2.y = m.max_y - p.y % m.size_y() - 1;
-      if (p.y > m.max_y)
-        p2.y = p.y % m.size_y();
-      return m.hasAt(p2, c);
-    };
-
-    for (int i = 0; i < 500; ++i)
+    for (int i = 0; i < 327; ++i)
     {
       unordered_set<Point> newPts;
 
@@ -61,26 +48,36 @@ public:
         auto neigh = p.GetDirectNeighbours();
         for (auto n : neigh)
         {
-          if ((hasMapAt(m, n, '.') || hasMapAt(m, n, 'S')))
+          if ((m.hasAtINF(n, '.') || m.hasAtINF(n, 'S')))
           {
             newPts.insert(n);
           }
         }
       }
 
-      if (i % 10 == 0)
-        cout << i << endl;
+      cout << i << "  :  " << newPts.size() << endl;
       pts = newPts;
+
+      if (!partTwo && i == 63)
+        return pts.size();
+
+      if (i == 64)
+        f0 = pts.size();
+      if (i == 195)
+        f1 = pts.size();
+      if (i == 326)
+        f2 = pts.size();
     }
 
-    ret = pts.size();
-    cout << "X : " << ret << endl;
-    return ret;
-  }
+    LL a, b, c;
+    c = f0;
+    a = (f2 - 2 * f1 + f0) / 2;
+    b = f1 - f0 - a;
 
-  LL DoWork2()
-  {
-    LL ret = 212;
+    LL x = 202300;
+    ret  = a * x * x + b * x + c;
+
+    cout << "X : " << ret << endl;
     return ret;
   }
 
@@ -88,21 +85,21 @@ public:
   {
     ReadData();
 
-    return std::to_string(DoWork1());
+    return std::to_string(DoWork(true));
   }
 
   string Part2() override
   {
     ReadData();
 
-    return std::to_string(DoWork2());
+    return std::to_string(DoWork(false));
   }
 
   bool Test() override
   {
     mCurrentInput = "test";
-    assert(Part1() != "");
-    //  assert(Part2() != "");
+    // assert(Part1() != "");
+    //   assert(Part2() != "");
     return true;
   }
 };

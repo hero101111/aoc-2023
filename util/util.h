@@ -1327,6 +1327,45 @@ public:
     return aVal == yData->second;
   }
 
+  auto hasAtINF(Point p, char c) -> bool
+  {
+    auto & m = *this;
+
+    Point p2 = p;
+    if (p2.x < 0)
+      p2.x = 1 + m.max_x - (abs(p.x) % m.size_x());
+    if (p2.x > m.max_x)
+      p2.x = p.x % m.size_x();
+
+    if (p2.y < 0)
+    {
+      p2.y = 1 + m.max_y - (abs(p.y) % m.size_y());
+    }
+    if (p2.y > m.max_y)
+      p2.y = p.y % m.size_y();
+    return m.hasAt(p2, c);
+  };
+
+  auto getAtINF(Point p) -> bool
+  {
+    auto & m  = *this;
+    Point  p2 = p;
+    if (p2.x < 0)
+      p2.x = 1 + m.max_x - (abs(p.x) % m.size_x());
+    if (p2.x > m.max_x)
+      p2.x = p.x % m.size_x();
+
+    if (p2.y < 0)
+    {
+      p2.y = 1 + m.max_y - (abs(p.y) % m.size_y());
+    }
+    if (p2.y > m.max_y)
+      p2.y = p.y % m.size_y();
+
+    assert(m.isSetAt(p2));
+    return m[p2];
+  };
+
   void set(Point p, T value)
   {
     if (p.x < min_x)
