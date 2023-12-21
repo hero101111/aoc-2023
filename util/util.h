@@ -1349,6 +1349,9 @@ public:
     data[p.x][p.y] = value;
   }
 
+  LL size_x() const { return 1 + max_x - min_x; }
+  LL size_y() const { return 1 + max_y - min_y; }
+
   auto operator[](Point p) -> T &
   {
     if (!at(p, nullptr))
