@@ -2,6 +2,8 @@
 
 #include "SolutionDay.h"
 
+static int _crtId{ 0 };
+
 class Day22 : public ISolutionDay
 {
 private:
@@ -22,9 +24,18 @@ public:
 
   struct brick
   {
+    int id;
+    brick()
+    {
+      _crtId++;
+      id = _crtId;
+    }
     Point a, b;
 
     unordered_set<Point> inner;
+
+    vector<brick *> restOnMe;
+    vector<brick *> restsOn;
 
     void UpdateInner()
     {
@@ -128,24 +139,94 @@ public:
 
     cout << "done falling" << endl;
 
-    // ----------
     ret = 0;
-    for (auto & b : br)
+
+    cout << "fetching boundaries" << endl;
+    for (auto & b_ : br)
     {
-      cout << "XXX" << endl;
-      b.alive    = false;
-      bool valid = true;
-      for (auto & b2 : br)
+      auto b = b_;
+      if (b.a.z > 1 && b.b.z > 1)
       {
-        if (b2 != b && b2.fall(br, true))
+        b.a.z -= 1;
+        b.b.z -= 1;
+        b.MoveInner(max(b.a.z + 1, b.b.z + 1), min(b.a.z, b.b.z));
+
+        for (auto & b2 : br)
         {
-          valid = false;
-          break;
+          if (b2 != b_ && b.intersects(b2))
+          {
+            b2.restOnMe.push_back(&b_);
+            b_.restsOn.push_back(&b2);
+          }
         }
       }
-      if (valid)
-        ret += 1;
-      b.alive = true;
+    }
+
+    // ----------
+    // ret   = 0;
+    // int k = 0;
+    // for (auto & b : br)
+    //{
+    //  cout << "XXX " << k++ << endl;
+    //  b.alive    = false;
+    //  bool valid = true;
+    //  for (auto & bToFall : br)
+    //  {
+    //    if (bToFall != b && bToFall.fall(br, true))
+    //    {
+    //      b.restOnMe.push_back(&bToFall);
+    //      valid = false;
+    //      // break;
+    //    }
+    //  }
+    //  if (valid)
+    //    ret += 1;
+    //  b.alive = true;
+    //}
+
+    function<LL(brick &)> detect;
+    detect = [&](brick & b) -> LL
+    {
+      b.alive               = false;
+      vector<brick *> check = b.restOnMe;
+      set<brick *>    brickSet;
+      while (!check.empty())
+      {
+        auto b2 = check.front();
+        check.erase(begin(check));
+
+        int  restsOnCount = 0;
+        auto restOn       = &b;
+        for (auto b2R : b2->restsOn)
+        {
+          if (b2R->alive)
+          {
+            restsOnCount++;
+            restOn = b2R;
+          }
+        }
+        if (restsOnCount == 0)
+        {
+          // assert(restOn == &b);
+          brickSet.insert(b2);
+        }
+      }
+      LL t = brickSet.size();
+      for (auto tt : brickSet)
+        t += detect(*tt);
+
+      return t;
+    };
+
+    cout << "detecting..." << endl;
+    ret     = 0;
+    int crt = 0;
+    for (auto & b : br)
+    {
+      cout << crt++ << endl;
+      for (auto & b2 : br)
+        b2.alive = true;
+      ret += detect(b);
     }
     cout << "X: " << ret << endl;
     return ret;
