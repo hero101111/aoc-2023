@@ -339,6 +339,16 @@ struct Point
     , w(stoll(aw))
   {
   }
+
+  Point(bool dummy, string coord)
+  {
+    auto v = tok(coord, ',');
+    assert(!v.empty());
+    x = stoll(v[0]);
+    y = stoll(v[1]);
+    z = stoll(v[2]);
+  }
+
   Point(tuple<string, string> coord)
     : x(stoll(get<0>(coord)))
     , y(stoll(get<1>(coord)))
