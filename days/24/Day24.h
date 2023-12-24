@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SolutionDay.h"
+#include "z3++.h"
 
 #define dmap DynamicMap
 #define uset unordered_set
@@ -30,7 +31,8 @@ public:
     Point v;
     bool  operator==(const hstone & other) const { return p == other.p && v == other.v; }
   };
-  LL DoWork1()
+
+  LL DoWork1(bool partTwo)
   {
     LL         ret = 0;
     dmap<char> m;
@@ -93,12 +95,46 @@ public:
       }
     }
 
-    return ret;
-  }
+    if (!partTwo)
+      return ret;
 
-  LL DoWork2()
-  {
-    LL ret = 242;
+    //-----------------------
+    //
+    z3::context c;
+    z3::expr    x  = c.int_const("x");
+    z3::expr    y  = c.int_const("y");
+    z3::expr    z  = c.int_const("z");
+    z3::expr    vx = c.int_const("vx");
+    z3::expr    vy = c.int_const("vy");
+    z3::expr    vz = c.int_const("vz");
+    z3::solver  solver(c);
+
+    for (int i = 0; i < stones.size(); ++i)
+    {
+      auto   d    = stones[i];
+      string strT = "t" + to_string(i);
+
+      z3::expr t   = c.int_const(strT.c_str());
+      auto     dpx = c.int_val(d.p.x);
+      auto     dvx = c.int_val(d.v.x);
+
+      auto dpy = c.int_val(d.p.y);
+      auto dvy = c.int_val(d.v.y);
+
+      auto dpz = c.int_val(d.p.z);
+      auto dvz = c.int_val(d.v.z);
+
+      solver.add(x + t * vx == dpx + dvx * t);
+      solver.add(y + t * vy == dpy + dvy * t);
+      solver.add(z + t * vz == dpz + dvz * t);
+    }
+
+    solver.check();
+    auto solution = solver.get_model();
+
+    ret = stoll(solution.eval(x + y + z).to_string());
+    //-----------------------
+
     return ret;
   }
 
@@ -106,14 +142,14 @@ public:
   {
     ReadData();
 
-    return std::to_string(DoWork1());
+    return std::to_string(DoWork1(false));
   }
 
   string Part2() override
   {
     ReadData();
 
-    return std::to_string(DoWork2());
+    return std::to_string(DoWork1(true));
   }
 
   bool Test() override
