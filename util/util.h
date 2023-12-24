@@ -1356,7 +1356,7 @@ public:
     return m.hasAt(p2, c);
   };
 
-  auto getAtINF(Point p) -> bool
+  auto getAtINF(Point p) -> char
   {
     auto & m  = *this;
     Point  p2 = p;
